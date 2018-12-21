@@ -4,22 +4,114 @@ import {
     Text,
     View,
     TouchableWithoutFeedback,
-    Image
+    Image,
+    ToastAndroid
 } from 'react-native';
+import * as actions from './store/actions';
+import { connect } from 'react-redux';
 
-export default class LeftSLide extends Component {
+class RightSlide extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            flag: false,
+            timenow: '',
+            heart: false
+        }
         this.selectSideMenu = this.selectSideMenu.bind(this);
+        this.lastDay = this.lastDay.bind(this);
+        this.nextDay = this.nextDay.bind(this);
+        this.Today = this.Today.bind(this);
     }
 
 
     //函数回调
     selectSideMenu() {
-        this.props.onSelectMenuItem();
+        this.setState({
+            heart: !this.state.heart,
+        }, () => {
+            this.state.heart ? ToastAndroid.showWithGravity('收藏成功', ToastAndroid.SHORT, ToastAndroid.CENTER) : ToastAndroid.showWithGravity('取消收藏', ToastAndroid.SHORT, ToastAndroid.CENTER);
+            let skr = this.props.result;
+            var result = {
+                title: skr.title,
+                author: skr.author,
+                time: skr.datetime.curr
+            }
+            this.state.heart ? this.props.onCollctionsPush(result) : this.props.onCollctionsCancle()
+            this.props.onSelectRightOpen();
+        });
     }
-    componentDidMount(){
-        console.log('加载完成')
+    onSharePress() {
+        this.props.onSelectShare();
+    }
+    lastDay() {
+        var timeLast = this.props.result.datetime.prev
+        this.setState({
+            flag: true,
+            timenow: timeLast
+        }, () => {
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params);
+        })
+        this.props.onSelectRightOpen();
+    }
+    nextDay() {
+        var timeNext = this.props.result.datetime.next;
+        this.setState({
+            timenow: timeNext
+        }, () => {
+            let timeNowShow = this.timeNow()
+            if (this.state.timenow == timeNowShow) {
+                this.setState({
+                    flag: false
+                })
+            } else {
+                this.setState({
+                    flag: true,
+                })
+            }
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params)
+            this.props.onSelectRightOpen();
+        });
+    }
+    Today() {
+        let timeNowToday = this.timeNow();
+        this.setState({
+            flag: false,
+            timenow: timeNowToday
+        }, () => {
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params);
+            this.props.onSelectRightOpen();
+        })
+    }
+    timeNow() {
+        var date = new Date();
+        var nowMonth = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (nowMonth >= 1 && nowMonth <= 9) {
+            nowMonth = "0" + nowMonth;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var nowDate = `${date.getFullYear()}${nowMonth}${strDate}`;
+        return nowDate;
+    }
+    randomDay() {
+        this.setState({
+            flag: true
+        });
+        var params = `random?dev=1`;
+        this.props.request(params);
+        this.props.onSelectRightOpen();
+    }
+    componentDidMount() {
+        let nowDate = this.timeNow();
+        this.setState({
+            timenow: nowDate
+        });
     }
     render() {
         return (
@@ -28,12 +120,12 @@ export default class LeftSLide extends Component {
                     this.selectSideMenu();
                 }}>
                     <View style={styles.collection}>
-                        <Image style={styles.IconImg} source={require('./assest/collection.png')} />
+                        <Image style={styles.IconImg} source={this.state.heart ? require('./assest/collectioned.png') : require('./assest/collection.png')} />
                         <Text style={styles.instructions}>收藏</Text>
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={() => {
-                    this.selectSideMenu();
+                    this.onSharePress();
                 }}>
                     <View style={styles.modal}>
                         <Image style={styles.IconImg} source={require("./assest/share.png")} />
@@ -41,7 +133,7 @@ export default class LeftSLide extends Component {
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={() => {
-                    this.selectSideMenu();
+                    this.lastDay();
                 }}>
                     <View style={styles.modal}>
                         <Image style={styles.IconImg} source={require("./assest/beforeDay.png")} />
@@ -49,7 +141,7 @@ export default class LeftSLide extends Component {
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={() => {
-                    this.selectSideMenu();
+                    this.randomDay();
                 }}>
                     <View style={styles.modal}>
                         <Image style={styles.IconImg} source={require("./assest/random.png")} />
@@ -57,18 +149,18 @@ export default class LeftSLide extends Component {
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={() => {
-                    this.selectSideMenu();
+                    this.nextDay();
                 }}>
-                    <View style={styles.modal}>
+                    <View style={[styles.modal, this.state.flag ? '' : styles.today]}>
                         <Image style={styles.IconImg} source={require("./assest/afterDay.png")} />
                         <Text style={styles.instructions}>后一天</Text>
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={() => {
-                    this.selectSideMenu();
+                    this.Today();
                 }}>
-                    <View style={styles.modal}>
-                        <Image style={styles.IconImg}source={require("./assest/today.png")} />
+                    <View style={[styles.modal, this.state.flag ? '' : styles.today]}>
+                        <Image style={styles.IconImg} source={require("./assest/today.png")} />
                         <Text style={styles.instructions}>今日</Text>
                     </View>
                 </TouchableWithoutFeedback>
@@ -77,30 +169,50 @@ export default class LeftSLide extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        collections: state.collections,
+        result: state.result
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
+        onCollctionsPush: (data) => dispatch(actions.onCollctionsPush(data)),
+        onCollctionsCancle: () => dispatch(actions.onCollctionsCancle()),
+        request: (data) => dispatch(actions.onRequestApiResult(data)),
+        onSelectShare: () => dispatch(actions.onSelectShare())
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(RightSlide);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#222',
         alignItems: 'center'
     },
-    modal:{
+    modal: {
         width: 50,
         height: 60,
-        alignItems:'center',
+        alignItems: 'center',
         justifyContent: 'center',
         marginTop: 6
     },
-    collection:{
+    collection: {
         width: 50,
         height: 60,
-        alignItems:'center',
+        alignItems: 'center',
         justifyContent: 'center',
         marginTop: 20
     },
-    instructions:{
+    today: {
+        display: "none"
+    },
+    instructions: {
         color: 'white'
     },
-    IconImg:{
+    IconImg: {
         width: 30,
         height: 30
     },

@@ -15,6 +15,7 @@ app.all('*', (req, res) => {
     if (req.url.indexOf('today')!==-1) {
         https.get("https://interface.meiriyiwen.com/article/today?dev=1", function (resProxy) {
             if (resProxy.statusCode === 200) {
+                console.log(resProxy)
                 resProxy.pipe(res);
             }
         })

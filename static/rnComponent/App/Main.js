@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import { Image, ScrollView, StyleSheet, Dimensions, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
-import ShareDialog  from './ShareDialog';
+import ShareDialog from './ShareDialog';
+import {connect} from 'react-redux';
+import * as actions from './store/actions';
 
-
-export default class Main extends Component {
+class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
         }
         this.SelectToOpenLeft = this.SelectToOpenLeft.bind(this);
         this.SelectToOpenRight = this.SelectToOpenRight.bind(this);
     }
     SelectToOpenLeft() {
-        this.props.SelectToOpenLeftSideMenu()
+        this.props.SelectDirectionLeft();
+        this.props.onSelectLeftOpen();
+        
     }
-    SelectToOpenRight() {
-        this.props.SelectToOpenRightSideMenu()
+    SelectToOpenRight() { 
+        this.props.SelectDirectionRight();
+        this.props.onSelectRightOpen();
+        
     }
     render() {
+        const {result} = this.props;
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -31,21 +36,35 @@ export default class Main extends Component {
                 </View>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={styles.title}>
-                        <Text style={styles.instructions}>{this.props.res.title}</Text>
+                        <Text style={styles.instructions}>{result.title}</Text>
                     </View>
-                    <Text style={styles.author}>{this.props.res.author}</Text>
+                    <Text style={styles.author}>{result.author}</Text>
                     <View style={styles.content}>
-                        <FlatList data={this.props.res.listContent}
+                        <FlatList data={result.listContent}
                             renderItem={({ item }) => <Text style={styles.item}>{'        ' + item}</Text>} />
                     </View>
-                    <Text style={styles.total}>全文完  共{this.props.res.total}字</Text>
-                </ScrollView>
-                <ShareDialog show={this.props.show} onShareDialog={this.props.onShareDialog}/>
+                    <Text style={styles.total}>全文完  共{result.total}字</Text>
+                </ScrollView> 
+                <ShareDialog/>
             </View>
 
         );
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        result: state.result
+    }
+}
+function mapDispatchToProps(dispatch) {
+    return {
+        onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
+        onSelectLeftOpen: () => dispatch(actions.onSelectLeftOpen())
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Main)
+
+
 
 const styles = StyleSheet.create({
     container: {

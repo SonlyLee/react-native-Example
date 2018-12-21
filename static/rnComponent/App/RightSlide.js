@@ -7,8 +7,10 @@ import {
     Image,
     ToastAndroid
 } from 'react-native';
+import * as actions from './store/actions';
+import { connect } from 'react-redux';
 
-export default class RightSlide extends Component {
+class RightSlide extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -20,6 +22,7 @@ export default class RightSlide extends Component {
         this.lastDay = this.lastDay.bind(this);
         this.nextDay = this.nextDay.bind(this);
         this.Today = this.Today.bind(this);
+        this.judge = this.judge.bind(this);
     }
 
 
@@ -27,35 +30,41 @@ export default class RightSlide extends Component {
     selectSideMenu() {
         this.setState({
             heart: !this.state.heart,
-        },()=>{
-            this.state.heart ? ToastAndroid.showWithGravity('收藏成功',ToastAndroid.SHORT,ToastAndroid.CENTER) : ToastAndroid.showWithGravity('取消收藏',ToastAndroid.SHORT,ToastAndroid.CENTER);
+        }, () => {
+            this.state.heart ? ToastAndroid.showWithGravity('收藏成功', ToastAndroid.SHORT, ToastAndroid.CENTER) : ToastAndroid.showWithGravity('取消收藏', ToastAndroid.SHORT, ToastAndroid.CENTER);
+            let skr = this.props.result;
             var result = {
-                title: this.props.title,
-                author: this.props.author,
-                time: this.props.datetime.curr
+                title: skr.title,
+                author: skr.author,
+                time: skr.datetime.curr
             }
-            this.state.heart ? this.props.collections.push(result) : this.props.collections.slice(0,this.props.collections.length-1)
-            this.props.onSelectMenuItem();
+            this.state.heart ? this.props.onCollctionsPush(result) : this.props.onCollctionsCancle()
+            this.props.onSelectRightOpen();
         });
     }
-    onSharePress(){
-        this.props.onShareDialog();
+    onSharePress() {
+        this.props.onSelectShare();
     }
     lastDay() {
-        var timeLast = this.props.datetime.prev
-        this.setState((preState, props) => ({
+        var timeLast = this.props.result.datetime.prev
+        this.setState({
             flag: true,
-            timenow: timeLast
-        }), () => {
-            this.props.onSelectToday(this.state.timenow);
+            timenow: timeLast,
+            heart: false
+        }, () => {
+            console.log('lastDay'+this.state.heart)
+            this.judge(this.state.timenow)
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params);
         })
-        this.props.onSelectMenuItem();
+        this.props.onSelectRightOpen();
     }
     nextDay() {
-        var timeNext = this.props.datetime.next
-        this.setState((preState, props) => ({
-            timenow: timeNext
-        }), () => {
+        var timeNext = this.props.result.datetime.next;
+        this.setState({
+            timenow: timeNext,
+            heart: false
+        }, () => {
             let timeNowShow = this.timeNow()
             if (this.state.timenow == timeNowShow) {
                 this.setState({
@@ -66,19 +75,24 @@ export default class RightSlide extends Component {
                     flag: true,
                 })
             }
-            this.props.onSelectToday(this.state.timenow);
-            this.props.onSelectMenuItem();
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params)
+            this.props.onSelectRightOpen();
+            this.judge(this.state.timenow)
         });
     }
     Today() {
         let timeNowToday = this.timeNow();
         this.setState({
             flag: false,
-            timenow: timeNowToday
+            timenow: timeNowToday,
+            heart: false
         }, () => {
-            this.props.onSelectToday(this.state.timenow);
+            var params = `day?dev=1&date=${this.state.timenow}`;
+            this.props.request(params);
+            this.props.onSelectRightOpen();
+            this.judge(this.state.timenow)
         })
-        this.props.onSelectMenuItem();
     }
     timeNow() {
         var date = new Date();
@@ -93,19 +107,33 @@ export default class RightSlide extends Component {
         var nowDate = `${date.getFullYear()}${nowMonth}${strDate}`;
         return nowDate;
     }
-    randomDay(){
+    randomDay() {
         this.setState({
-            flag: true
-        })
-        this.props.onSelectToday();
-        this.props.onSelectMenuItem();        
+            flag: true,
+            heart: false
+        });
+        var params = `random?dev=1`;
+        this.props.request(params);
+        this.props.onSelectRightOpen();
     }
     componentDidMount() {
         let nowDate = this.timeNow();
         this.setState({
             timenow: nowDate
-        })
+        },()=>{
+            this.judge(this.state.timenow);
+        });
     }
+    judge=(paramTime)=>{
+        for(var i=0;i<this.props.collections.length;i++){
+            if(this.props.collections[i].time === paramTime){
+                this.setState({
+                    heart: true
+                })                
+            }
+        }
+    }
+    
     render() {
         return (
             <View style={styles.container}>
@@ -113,7 +141,7 @@ export default class RightSlide extends Component {
                     this.selectSideMenu();
                 }}>
                     <View style={styles.collection}>
-                        <Image style={styles.IconImg} source={this.state.heart ? require('./assest/collectioned.png'): require('./assest/collection.png')} />
+                        <Image style={styles.IconImg} source={this.state.heart ? require('./assest/collectioned.png') : require('./assest/collection.png')} />
                         <Text style={styles.instructions}>收藏</Text>
                     </View>
                 </TouchableWithoutFeedback>
@@ -161,6 +189,23 @@ export default class RightSlide extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        collections: state.collections,
+        result: state.result
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
+        onCollctionsPush: (data) => dispatch(actions.onCollctionsPush(data)),
+        onCollctionsCancle: () => dispatch(actions.onCollctionsCancle()),
+        request: (data) => dispatch(actions.onRequestApiResult(data)),
+        onSelectShare: () => dispatch(actions.onSelectShare())
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(RightSlide);
 
 const styles = StyleSheet.create({
     container: {
