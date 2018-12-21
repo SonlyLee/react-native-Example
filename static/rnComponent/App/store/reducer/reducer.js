@@ -8,29 +8,29 @@ export const shareReducer = (state = {}, action) => {
     }
 }
 
-export const rightOpenReducer = (state={}, action) => {
-    switch (action.type) {
-        case ActionTypes.RIGHTOPEN:
-            return !state;
-        default: return state;
-    }
-}
+// export const rightOpenReducer = (state={}, action) => {
+//     switch (action.type) {
+//         case ActionTypes.RIGHTOPEN:
+//             return !state;
+//         default: return state;
+//     }
+// }
 
-export const leftOpenReducer = (state = {}, action) => {
-    switch (action.type) {
-        case ActionTypes.LEFTOPEN:
-            return !state;
-        default: return state;
-    }
-}
+// export const leftOpenReducer = (state = {}, action) => {
+//     switch (action.type) {
+//         case ActionTypes.LEFTOPEN:
+//             return !state;
+//         default: return state;
+//     }
+// }
 
-export const directionReducer = (state = {}, action) => {
-    switch (action.type) {
-        case ActionTypes.DIRECTION:
-            return state = !state;
-        default: return state;
-    }
-}
+// export const directionReducer = (state = {}, action) => {
+//     switch (action.type) {
+//         case ActionTypes.DIRECTION:
+//             return state = !state;
+//         default: return state;
+//     }
+// }
 
 export const collectionsReducer = (state = [], action) => {
     switch (action.type) {

@@ -14,12 +14,12 @@ class Main extends Component {
     }
     SelectToOpenLeft() {
         this.props.SelectDirectionLeft();
-        this.props.onSelectLeftOpen();
+        // this.props.onSelectLeftOpen();
         
     }
     SelectToOpenRight() { 
         this.props.SelectDirectionRight();
-        this.props.onSelectRightOpen();
+        // this.props.onSelectRightOpen();
         
     }
     render() {
@@ -58,8 +58,8 @@ const mapStateToProps = (state) => {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
-        onSelectLeftOpen: () => dispatch(actions.onSelectLeftOpen())
+        // onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
+        // onSelectLeftOpen: () => dispatch(actions.onSelectLeftOpen())
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Main)

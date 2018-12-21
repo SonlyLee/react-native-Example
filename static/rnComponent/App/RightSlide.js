@@ -39,7 +39,7 @@ class RightSlide extends Component {
                 time: skr.datetime.curr
             }
             this.state.heart ? this.props.onCollctionsPush(result) : this.props.onCollctionsCancle()
-            this.props.onSelectRightOpen();
+            this.props.closeIsopen();
         });
     }
     onSharePress() {
@@ -57,7 +57,7 @@ class RightSlide extends Component {
             var params = `day?dev=1&date=${this.state.timenow}`;
             this.props.request(params);
         })
-        this.props.onSelectRightOpen();
+        this.props.closeIsopen();
     }
     nextDay() {
         var timeNext = this.props.result.datetime.next;
@@ -77,8 +77,8 @@ class RightSlide extends Component {
             }
             var params = `day?dev=1&date=${this.state.timenow}`;
             this.props.request(params)
-            this.props.onSelectRightOpen();
             this.judge(this.state.timenow)
+            this.props.closeIsopen();
         });
     }
     Today() {
@@ -90,8 +90,9 @@ class RightSlide extends Component {
         }, () => {
             var params = `day?dev=1&date=${this.state.timenow}`;
             this.props.request(params);
-            this.props.onSelectRightOpen();
+
             this.judge(this.state.timenow)
+            this.props.closeIsopen();
         })
     }
     timeNow() {
@@ -114,7 +115,7 @@ class RightSlide extends Component {
         });
         var params = `random?dev=1`;
         this.props.request(params);
-        this.props.onSelectRightOpen();
+        this.props.closeIsopen();
     }
     componentDidMount() {
         let nowDate = this.timeNow();
@@ -198,7 +199,6 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        onSelectRightOpen: () => dispatch(actions.onSelectRightOpen()),
         onCollctionsPush: (data) => dispatch(actions.onCollctionsPush(data)),
         onCollctionsCancle: () => dispatch(actions.onCollctionsCancle()),
         request: (data) => dispatch(actions.onRequestApiResult(data)),

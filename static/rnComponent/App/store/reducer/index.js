@@ -3,9 +3,9 @@ import {combineReducers} from 'redux';
 
 const reducer = combineReducers({
     showSharePop: shareReducer,
-    isOpen: rightOpenReducer,
-    isOpenLeft: leftOpenReducer,
-    direction: directionReducer,
+    // isOpen: rightOpenReducer,
+    // isOpenLeft: leftOpenReducer,
+    // direction: directionReducer,
     collections: collectionsReducer,
     result: requestResultReducer,
 })

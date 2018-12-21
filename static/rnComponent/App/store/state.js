@@ -1,8 +1,8 @@
 export default {
     showSharePop: false,    //分享页的展开与关闭，默认是false
-    isOpen: false,    //右边的侧边栏是否显示
-    isOpenLeft: false,    //左边的侧边栏是否显示
-    direction: false,
+    // isOpen: false,    //右边的侧边栏是否显示
+    // isOpenLeft: false,    //左边的侧边栏是否显示
+    // direction: false,
     collections: [],
     result: {
         title: '',      //文章的标题

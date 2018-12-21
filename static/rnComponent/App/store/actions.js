@@ -8,23 +8,23 @@ export const onSelectShare = () => {
     }
 }
 
-export const onSelectRightOpen = () => {
-    return {
-        type: ActionTypes.RIGHTOPEN
-    }
-}
+// export const onSelectRightOpen = () => {
+//     return {
+//         type: ActionTypes.RIGHTOPEN
+//     }
+// }
 
-export const onSelectLeftOpen = () => {
-    return {
-        type: ActionTypes.LEFTOPEN
-    }
-}
+// export const onSelectLeftOpen = () => {
+//     return {
+//         type: ActionTypes.LEFTOPEN
+//     }
+// }
 
-export const onSelectDirection = () => {
-    return {
-        type: ActionTypes.DIRECTION
-    }
-}
+// export const onSelectDirection = () => {
+//     return {
+//         type: ActionTypes.DIRECTION
+//     }
+// }
 
 export const onCollctionsPush = (data) => {
     return {
